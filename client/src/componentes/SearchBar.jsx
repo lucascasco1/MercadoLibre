@@ -135,7 +135,7 @@ const Home = () => {
   function Siguiente() {
     console.log(offset)
     return (
-      <div>
+      <div className={style.sig} >
         <button onClick={aumentar}>
           siguiente
             </button>
