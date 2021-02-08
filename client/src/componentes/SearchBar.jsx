@@ -55,20 +55,37 @@ const Home = () => {
   const orderFilteredProducts = (state) => {
     return products.filter(p => p.condition === state)
   }
-  useEffect(() => {
+
+  const ascendente = (a,b) =>{
+    return a.price - b.price
+  }
+
+  const descendente = (a,b) =>{
+    return b.price - a.price
+  }
+
+  const ordenar = () =>{
     console.log("dentro de useEffect")
     console.log(orderProducts)
     if (orderProducts === "ascendente") {
-      setFilteredProducts(sortProducts(filteredProducts, orderProducts))
+      // setFilteredProducts(products.sort(ascendente))
+      const data=filteredProducts;
+      console.log(data, "aca la data")
+      data.sort(ascendente)
+      console.log(data, "nueva")
+      setFilteredProducts(data)
     }
     else if (orderProducts === "descendente") {
-      setFilteredProducts(sortProducts(filteredProducts, orderProducts))
-      console.log("aaa")
+      setFilteredProducts(filteredProducts.sort(descendente))
     }
     else {
       setOrderProducts: clone(products)
       // setOrderProducts(products)
     }
+  }
+
+  useEffect(() => {
+    ordenar()
   }, [orderProducts])
 
   useEffect(() => {
@@ -85,9 +102,25 @@ const Home = () => {
 
   }, [stateProduct])
 
-  useEffect(() => {
-    setFilteredProducts(products)
-  }, [products])
+  // useEffect(() => {
+  //   setFilteredProducts(products)
+  // }, [products])
+
+
+
+  useEffect(() =>{
+  if(searchValue !== ""){
+    getProduct(searchValue, offset)
+  }
+  }, [offset])
+
+  const anterior = () =>{
+    setOffset(offset - 5);
+  }
+
+  const aumentar = () =>{
+    setOffset(offset + 5);
+  }
 
   function Anterior() {
     return (
@@ -103,34 +136,13 @@ const Home = () => {
     console.log(offset)
     return (
       <div>
-        <button onClick={siguiente}>
+        <button onClick={aumentar}>
           siguiente
             </button>
       </div>
     );
   }
 
-  const anterior = () =>{
-    setOffset(offset - 5);
-    getProduct(searchValue,offset)
-  }
-
-  const siguiente = () =>{
-    setOffset(offset + 5);
-    getProduct(searchValue,offset)
-  }
-  
-  const sortProducts = (arr, c) => {
-    return arr.sort((a, b) => {
-      if (((a.price > b.price) && c === 'ascendente') || ((a.price < b.price) && c === 'descendente')) {
-        return 1;
-      }
-      else if (((a.price > b.price) && c === 'descendente') || ((a.price < b.price) && c === 'ascendente')) {
-        return -1;
-      }
-      return 0
-    })
-  }
 
   const clone = matriz => matriz.map(i => (Array.isArray(i) ? clone(i) : i));
 
@@ -150,7 +162,7 @@ const Home = () => {
     }
     axios.post("http://localhost:3000/products",data).then(data => {
       console.log(data)
-      setProducts(data.data.results)
+      setFilteredProducts(data.data.results)
     })
   }
 
@@ -189,7 +201,7 @@ const Home = () => {
         ><SearchIcon /></i>
 
         <>
-          <select className={style.ord} requiered name="all" id="all" onChange={changeOrderProduct}>
+          <select className={style.ord} requiered name="all" id="all" onChange={changeOrderProduct} value = {orderProducts}>
             <option value="ascendente">descendente</option>
             <option value="descendente">ascendente</option>
           </select>
