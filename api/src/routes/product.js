@@ -2,10 +2,14 @@ const server = require('express').Router();
 const fetch = require('node-fetch')
 
 
-server.get('/', (req, res, offset) => {
-	const q= req.query.q; 
-    let off = 0;
-	fetch(`https://api.mercadolibre.com/sites/MLA/search?q=${q}&offset=${off}&limit=5`).then (data=>data.json()).then (response=>res.send(response))
+server.post('/', (req, res) => {
+	// const q= req.query.q; 
+    // let offset = 0;
+	const {q,offset} = req.body;
+	console.log(q, "esto es q")
+	console.log (offset, "offset")
+	fetch(`https://api.mercadolibre.com/sites/MLA/search?q=${q}&offset=${offset}&limit=5`).then (data=>data.json()).then (response=>res.send(response))
 });
 
 module.exports = server;
+

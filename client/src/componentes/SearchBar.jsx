@@ -50,7 +50,7 @@ const Home = () => {
   const [filteredProducts, setFilteredProducts] = useState([]);
   const [stateProduct, setStateProduct] = useState("default");
   const [orderProducts, setOrderProducts] = useState("default");
-  const [offset, setOffset] = useState();
+  const [offset, setOffset] = useState(0);
 
   const orderFilteredProducts = (state) => {
     return products.filter(p => p.condition === state)
@@ -89,18 +89,37 @@ const Home = () => {
     setFilteredProducts(products)
   }, [products])
 
-  function Paginacion() {
-    const [offset, setOffset] = useState(0);
-
+  function Anterior() {
     return (
       <div>
-        <button onClick={() => setOffset(offset + 5)}>
+        <button onClick={anterior}>
+          anterior
+            </button>
+      </div>
+    );
+  }
+
+  function Siguiente() {
+    console.log(offset)
+    return (
+      <div>
+        <button onClick={siguiente}>
           siguiente
             </button>
       </div>
     );
   }
 
+  const anterior = () =>{
+    setOffset(offset - 5);
+    getProduct(searchValue,offset)
+  }
+
+  const siguiente = () =>{
+    setOffset(offset + 5);
+    getProduct(searchValue,offset)
+  }
+  
   const sortProducts = (arr, c) => {
     return arr.sort((a, b) => {
       if (((a.price > b.price) && c === 'ascendente') || ((a.price < b.price) && c === 'descendente')) {
@@ -116,13 +135,24 @@ const Home = () => {
   const clone = matriz => matriz.map(i => (Array.isArray(i) ? clone(i) : i));
 
 
-  const getProduct = (q) => {
-    console.log(q)
-    axios.get("http://localhost:3000/products?q=" + q).then(data => {
+  // const getProduct = (q) => {
+  //   console.log(q)
+  //   axios.get("http://localhost:3000/products?q=" + q).then(data => {
+  //     console.log(data)
+  //     setProducts(data.data.results)
+  //   })
+  // };.
+
+  const getProduct = (q, offset) => {
+    let data = {
+      q,
+      offset
+    }
+    axios.post("http://localhost:3000/products",data).then(data => {
       console.log(data)
       setProducts(data.data.results)
     })
-  };
+  }
 
 
   const changeStateProduct = (e) => {
@@ -154,7 +184,7 @@ const Home = () => {
           className={style.searchButton}
           value={1}
           onClick={(e) => {
-            getProduct(searchValue)
+            getProduct(searchValue, offset)
           }}
         ><SearchIcon /></i>
 
@@ -171,9 +201,10 @@ const Home = () => {
             <option value="used">usado</option>
           </select>
         </>
-        
+
         <div>
-        {Paginacion()}
+          {Anterior()}
+          {Siguiente()}
         </div>
       </div>
       <img className={style.logo} src={logo} />
