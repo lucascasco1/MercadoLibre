@@ -9,7 +9,7 @@ const Home = () => {
   function Buscar({ producto }) {
     function Stock() {
       let dispon = "Stock no disponible";
-      if (producto.available_quantity > 0) {
+      if (producto.available_quantity > 0 && producto.state !== "not_specified") {
         dispon = producto.available_quantity;
       }
       return dispon
@@ -48,7 +48,7 @@ const Home = () => {
   const [BuscarDetalle, setBuscarDetalle] = useState({});
   const [products, setProducts] = useState([]);
   const [filteredProducts, setFilteredProducts] = useState([]);
-  const [stateProduct, setStateProduct] = useState("default");
+  const [stateProduct, setStateProduct] = useState("all");
   const [orderProducts, setOrderProducts] = useState("default");
   const [offset, setOffset] = useState(0);
 
@@ -88,31 +88,38 @@ const Home = () => {
     ordenar()
   }, [orderProducts])
 
-  useEffect(() => {
-    console.log(stateProduct)
-    if (stateProduct === "new") {
-      setFilteredProducts(orderFilteredProducts(stateProduct))
-    }
-    else if (stateProduct === "used") {
-      setFilteredProducts(orderFilteredProducts(stateProduct))
-    }
-    else {
-      setFilteredProducts(products)
-    }
+  // useEffect(() => {
+  //   console.log(stateProduct)
+  //   if (stateProduct === "new") {
+  //     setFilteredProducts(orderFilteredProducts(stateProduct))
+  //   }
+  //   else if (stateProduct === "used") {
+  //     setFilteredProducts(orderFilteredProducts(stateProduct))
+  //   }
+  //   else {
+  //     setFilteredProducts(products)
+  //   }
 
-  }, [stateProduct])
+  // }, [stateProduct])
 
   // useEffect(() => {
   //   setFilteredProducts(products)
   // }, [products])
 
-
+ 
 
   useEffect(() =>{
   if(searchValue !== ""){
-    getProduct(searchValue, offset)
+    getProduct(searchValue, offset,stateProduct)
   }
   }, [offset])
+
+  useEffect(() =>{
+    
+      getProduct(searchValue, offset,stateProduct)
+    
+  },[stateProduct])
+  
 
   const anterior = () =>{
     setOffset(offset - 5);
@@ -155,20 +162,23 @@ const Home = () => {
   //   })
   // };.
 
-  const getProduct = (q, offset) => {
+  const getProduct = (q, offset,stateProduct) => {
     let data = {
       q,
-      offset
+      offset,
+      stateProduct
     }
     axios.post("http://localhost:3000/products",data).then(data => {
       console.log(data)
+      console.log (stateProduct, "chauuu")
       setFilteredProducts(data.data.results)
     })
   }
-
-
+  
+  
   const changeStateProduct = (e) => {
     setStateProduct(e.target.value)
+    console.log(stateProduct,"holaaa")
   }
 
   const changeOrderProduct = (e) => {
@@ -208,7 +218,7 @@ const Home = () => {
         </>
         <>
           <select className={style.estado} requiered name="all" id="all" onChange={changeStateProduct}>
-            <option value="default">default</option>
+            <option value="all">default</option>
             <option value="new">nuevo</option>
             <option value="used">usado</option>
           </select>
